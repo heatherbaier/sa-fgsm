@@ -1,0 +1,34 @@
+{
+  "West Africa": [
+    "BF", "CM", "CI", "GM", "GH", "GN", "LR", "ML", "MR", "NE", 
+    "NG", "SN", "SL", "TG"
+  ],
+  "East Africa": [
+    "BU", "CD", "KM", "ET", "KE", "MD", "MW", "MZ", "RW", "SZ", 
+    "TZ", "UG", "ZM", "ZW"
+  ],
+  "Central Africa": [
+    "AO", "CD", "CO", "GA"
+  ],
+  "Southern Africa": [
+    "LS", "NA", "ZA", "ZW"
+  ],
+  "North Africa and Middle East": [
+    "EG", "JO", "MA"
+  ],
+  "South Asia": [
+    "BD", "IA", "NP", "PK"
+  ],
+  "Southeast Asia": [
+    "KH", "ID", "MM", "PH"
+  ],
+  "Central Asia": [
+    "AM", "KG", "TJ", "UZ"
+  ],
+  "Latin America and Caribbean": [
+    "BO", "CO", "DO", "GT", "GY", "HT", "HN", "PE"
+  ],
+  "Eastern Europe": [
+    "AL", "MD"
+  ]
+}

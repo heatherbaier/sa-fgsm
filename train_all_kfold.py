@@ -24,38 +24,32 @@ from dataloader import PlanetData
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
-    parser.add_argument('folder_name', type = str)
-    parser.add_argument('model_name', type = str, help = "can be one of: SpA, DeepAll, GeoConv, FC")
-    parser.add_argument('--bs', required = False, default = 64, type = int)
+    # parser.add_argument('folder_name', type = str)
+    parser.add_argument('region', type = str, help = "can be one of: SpA, DeepAll, GeoConv, FC")
+    parser.add_argument('--version', required = False, default = 1, type = str)
+    parser.add_argument('--bs', required = False, default = 1, type = int)
     parser.add_argument('--num_epochs', required = False, default = 200, type = int)
     parser.add_argument('--lr', required = False, type = float, default = 0.00005)
     parser.add_argument('--iters', required = False, default = 64, help = "only needed when model is GeoConv, basically bath size")
     parser.add_argument('--sample', required = False, default = 0, type = int)
     parser.add_argument('--num_kfolds', required = False, default = 3)
-    parser.add_argument('--labels_path', required = False, default = "/sciclone/geograd/heather_data/ti/data/southern_africa_ys.json")
     parser.add_argument('--transforms_path', required = False, default = "/sciclone/geograd/Heather/c1/transform_stats_sc.json")
-    parser.add_argument('--coords_path', required = False, default = "/sciclone/geograd/heather_data/ti/data/southern_africa_coords.json")
-    parser.add_argument('--results_dir', required = False, default = "/sciclone/geograd/heather_data/ti/models/")
+    parser.add_argument('--results_dir', required = False, default = "/sciclone/geograd/heather_data/ti/new_models/")
     parser.add_argument('--device', required = False, default = "cuda")
     parser.add_argument('--use_scheduler', action='store_true', help='')
     parser.add_argument('--postval', action='store_true', help='')
-    # parser.add_argument('--ts4', action='store_true', help='')
     parser.add_argument('--use_means', action='store_true', help='')
     parser.add_argument('--norm_coords', action='store_true', help='')
     parser.add_argument('--weighted', action='store_true', help='')
     args = parser.parse_args() 
     
     print(args)
-    
-    # Add prefix to file paths if running on ts4
-    # if args.ts4:
-    #     transforms_path = "/rapids/notebooks" + args.transforms_path
-    #     folder_name = "/rapids/notebooks" + args.results_dir + args.folder_name
-    #     labels_path = "/rapids/notebooks" + args.labels_path
-    # else:
+
     transforms_path = args.transforms_path
-    folder_name = args.results_dir + args.folder_name
-    labels_path = args.labels_path        
+    folder_name = os.path.join(args.results_dir, f"{args.region}_v{args.version}" )
+    labels_path = f"/sciclone/geograd/heather_data/ti/data_new/{args.region}_ys.json"
+    coords_path = f"/sciclone/geograd/heather_data/ti/data_new/{args.region}_coords.json"
+    model_name = "GeoConv"
     
     # Make training folder
     if not os.path.exists(folder_name):
@@ -68,7 +62,7 @@ if __name__ == "__main__":
 
     # Initialize datasets and transform
     target_dataset = PlanetData(labels_path = labels_path, 
-                                coords_path = args.coords_path,
+                                coords_path = coords_path,
                                 transform = ts, 
                                 sample = args.sample, 
                                 postval = args.postval)
@@ -101,7 +95,7 @@ if __name__ == "__main__":
             val_file.write('\n'.join(map(str, val_indices)))           
 
         # Instantiate model
-        model = construct_model(args.model_name, args.norm_coords, args.use_means)
+        model = construct_model("GeoConv", args.norm_coords, args.use_means)
         model.to(args.device)    
 
         print(model)
@@ -159,7 +153,7 @@ if __name__ == "__main__":
                     # forward
                     with torch.set_grad_enabled(phase == 'train'):
 
-                        if args.model_name in ["SpA", "GeoConv", "FC"]:
+                        if model_name in ["SpA", "GeoConv", "FC"]:
                             outputs = model(inputs, coords)
                         else:
                             outputs = model(inputs)
@@ -176,7 +170,7 @@ if __name__ == "__main__":
 
                             loss.backward()
 
-                            if args.model_name == "GeoConv":
+                            if model_name == "GeoConv":
                                 if c % iters == 0:
                                     optimizer.step()
                                     optimizer.zero_grad()       
